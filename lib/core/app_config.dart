@@ -1,8 +1,23 @@
-/// Saklar perilaku yang masih jadi pertanyaan terbuka di dokumen konteks.
+/// Pengaturan perilaku & koneksi yang bisa disesuaikan di satu tempat.
 
-/// Jika true, saklar kendali manual dinonaktifkan saat alat IoT terputus.
-/// Desain mobile asli masih membolehkan klik saat terputus, jadi default false.
-const bool kDisableControlsWhenOffline = false;
+/// true = status kolam memakai data dummy (4 skenario; ganti skenario dengan
+/// tekan lama badge koneksi di header saat debug). false = baca RTDB
+/// `kolam_status`. Kontrol (`kolam_control`) selalu memakai RTDB.
+const bool kUseDummyStatus = false;
+
+/// Batas "Terputus": tidak ada pembaruan `last_updated` selama durasi ini.
+/// ESP32 menulis tiap 2 detik, jadi 6 detik = toleransi 2 paket hilang.
+const Duration kStaleAfter = Duration(seconds: 6);
+
+/// Jika true, semua saklar kontrol dinonaktifkan saat alat IoT terputus
+/// (perintah tidak akan sampai ke alat, jadi jangan beri kesan berhasil).
+const bool kDisableControlsWhenOffline = true;
+
+/// Cadangan URL Realtime Database (region Singapore) bila `firebase_options`
+/// tidak memuat `databaseURL`. URL ini identitas database, bukan rahasia;
+/// keamanan datanya dijaga oleh Security Rules, bukan oleh URL.
+const String kRtdbUrlFallback =
+    'https://catfish-peace-polindra-default-rtdb.asia-southeast1.firebasedatabase.app';
 
 /// Jika true, daftar log peringatan dikosongkan (untuk melihat state kosong).
 const bool kDummyEmptyLogs = false;

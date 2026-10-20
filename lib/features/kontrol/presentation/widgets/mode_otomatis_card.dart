@@ -8,10 +8,14 @@ class ModeOtomatisCard extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final bool value;
   final ValueChanged<bool> onChanged;
+
+  /// false = saklar tidak bisa diklik (mis. alat / server terputus).
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +64,7 @@ class ModeOtomatisCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Switch(value: value, onChanged: onChanged),
+          Switch(value: value, onChanged: enabled ? onChanged : null),
         ],
       ),
     );

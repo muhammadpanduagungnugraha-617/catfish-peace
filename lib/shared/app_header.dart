@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_colors.dart';
+import '../core/app_config.dart';
 import '../core/breakpoints.dart';
 import '../features/auth/application/auth_provider.dart';
 import '../features/dashboard/application/pool_status_provider.dart';
@@ -16,13 +17,11 @@ class AppHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wide = Breakpoints.isWide(context);
-    final status = ref.watch(poolStatusProvider).valueOrNull;
-
-    final badge = status == null
-        ? ConnectionBadgeState.connecting
-        : status.isOnline
-            ? ConnectionBadgeState.connected
-            : ConnectionBadgeState.disconnected;
+    final badge = switch (ref.watch(poolConnectionProvider)) {
+      PoolConnection.checking => ConnectionBadgeState.connecting,
+      PoolConnection.online => ConnectionBadgeState.connected,
+      PoolConnection.offline => ConnectionBadgeState.disconnected,
+    };
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -66,7 +65,10 @@ class AppHeader extends ConsumerWidget {
                 ),
               ),
               GestureDetector(
-                onLongPress: kDebugMode ? () => _cycleScenario(context, ref) : null,
+                // Ganti skenario hanya bermakna untuk data dummy.
+                onLongPress: (kDebugMode && kUseDummyStatus)
+                    ? () => _cycleScenario(context, ref)
+                    : null,
                 child: ConnectionBadge(state: badge),
               ),
               const SizedBox(width: 4),

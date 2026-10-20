@@ -20,8 +20,8 @@ class RiwayatScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(sensorHistoryProvider);
     final logs = ref.watch(alertLogsProvider);
-    final status = ref.watch(poolStatusProvider).valueOrNull;
-    final offline = status != null && !status.isOnline;
+    // Termasuk kasus "belum ada data dari alat" (dianggap terputus).
+    final offline = ref.watch(poolConnectionProvider) == PoolConnection.offline;
 
     return ScreenScroll(
       children: [

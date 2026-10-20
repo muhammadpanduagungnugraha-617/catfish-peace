@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/app_colors.dart';
 import '../../../shared/error_card.dart';
 import '../../../shared/offline_banner.dart';
 import '../../../shared/screen_scroll.dart';
@@ -18,13 +19,25 @@ class DashboardScreen extends ConsumerWidget {
     final async = ref.watch(poolStatusProvider);
     final status = async.valueOrNull;
 
-    if (status == null && async.hasError) {
+    if (async.hasError && !async.hasValue) {
       return ScreenScroll(
         children: [
           ErrorCard(
             message: 'Data kolam tidak bisa dimuat. Periksa koneksi atau izin akses.',
             onRetry: () => ref.invalidate(poolStatusProvider),
           ),
+        ],
+      );
+    }
+
+    // Node kosong: alat belum pernah mengirim data. Jangan tampilkan angka
+    // palsu sebagai pembacaan sensor.
+    if (async.hasValue && status == null) {
+      return const ScreenScroll(
+        children: [
+          OfflineBanner(),
+          SizedBox(height: 24),
+          _NoDataCard(),
         ],
       );
     }
@@ -49,6 +62,42 @@ class DashboardScreen extends ConsumerWidget {
         const SizedBox(height: 16),
         ParameterGrid(status: status),
       ],
+    );
+  }
+}
+
+class _NoDataCard extends StatelessWidget {
+  const _NoDataCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Column(
+        children: [
+          Icon(Icons.sensors_off_outlined,
+              size: 40, color: AppColors.textDisabled),
+          SizedBox(height: 12),
+          Text(
+            'Belum ada data dari alat',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Data akan muncul setelah alat IoT mengirim pembacaan pertama.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+          ),
+        ],
+      ),
     );
   }
 }

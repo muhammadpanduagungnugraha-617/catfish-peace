@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../core/app_colors.dart';
 
-/// Banner peach saat alat IoT terputus.
+/// Banner peach saat alat IoT terputus. [message] bisa diganti untuk kasus
+/// lain yang tampilannya sama (mis. aplikasi sendiri terputus dari server).
 class OfflineBanner extends StatelessWidget {
-  const OfflineBanner({super.key});
+  const OfflineBanner({
+    super.key,
+    this.message = 'Alat IoT kolam tidak terhubung ke internet',
+  });
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +20,15 @@ class OfflineBanner extends StatelessWidget {
         color: AppColors.offlineBannerBg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.cloud_off_outlined, size: 20, color: AppColors.offlineIcon),
-          SizedBox(width: 12),
+          const Icon(Icons.cloud_off_outlined,
+              size: 20, color: AppColors.offlineIcon),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Alat IoT kolam tidak terhubung ke internet',
-              style: TextStyle(
+              message,
+              style: const TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,

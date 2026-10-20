@@ -14,6 +14,7 @@ class ManualControlTile extends StatelessWidget {
     required this.iconBackground,
     required this.title,
     required this.isOn,
+    required this.statusText,
     required this.enabled,
     required this.onChanged,
   });
@@ -22,7 +23,13 @@ class ManualControlTile extends StatelessWidget {
   final Color iconColor;
   final Color iconBackground;
   final String title;
+
+  /// Posisi saklar.
   final bool isOn;
+
+  /// Teks status di bawah judul. Berasal dari status ASLI relay, bukan dari
+  /// perintah yang dikirim.
+  final String statusText;
   final bool enabled;
   final ValueChanged<bool> onChanged;
 
@@ -71,7 +78,7 @@ class ManualControlTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    isOn ? 'Sedang nyala' : 'Sedang mati',
+                    statusText,
                     style: TextStyle(
                       fontSize: 12.5,
                       color: enabled
