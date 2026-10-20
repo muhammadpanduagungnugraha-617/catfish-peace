@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/breakpoints.dart';
@@ -18,13 +20,23 @@ class ParameterGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final wide = Breakpoints.isWide(context);
 
-    return GridView.count(
+    // Tinggi kartu ditentukan oleh isinya, bukan oleh lebar layar. Dulu
+    // memakai childAspectRatio, sehingga kartu memendek saat layar menyempit
+    // padahal tinggi isinya tetap -> "BOTTOM OVERFLOWED". Nilai dasar di bawah
+    // sedikit di atas tinggi isi (wide ±188 px, mobile ±153 px) dan dikalikan
+    // skala font sistem supaya tetap muat saat teks diperbesar.
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final cardHeight = (wide ? 200.0 : 172.0) * math.max(1.0, textScale);
+
+    return GridView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: wide ? 4 : 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: wide ? 1.5 : 0.94,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: wide ? 4 : 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        mainAxisExtent: cardHeight,
+      ),
       children: [
         for (final key in ParamKey.values)
           if (status == null)
