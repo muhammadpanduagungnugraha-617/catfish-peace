@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../shared/error_card.dart';
+import '../../../shared/offline_banner.dart';
 import '../../../shared/screen_scroll.dart';
 import '../../../shared/section_header.dart';
 import '../../../shared/shimmer_box.dart';
+import '../../dashboard/application/pool_status_provider.dart';
 import '../application/history_providers.dart';
 import 'widgets/alert_log_tile.dart';
 import 'widgets/chart_legend.dart';
@@ -18,9 +20,15 @@ class RiwayatScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(sensorHistoryProvider);
     final logs = ref.watch(alertLogsProvider);
+    final status = ref.watch(poolStatusProvider).valueOrNull;
+    final offline = status != null && !status.isOnline;
 
     return ScreenScroll(
       children: [
+        if (offline) ...[
+          const OfflineBanner(),
+          const SizedBox(height: 20),
+        ],
         const SectionHeader(
           title: 'Riwayat Sensor',
           subtitle: 'Log suhu air, keasaman, kekeruhan, dan amonia.',
