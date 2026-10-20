@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/app_colors.dart';
 import '../../application/auth_provider.dart';
@@ -31,6 +30,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   final _passC = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
+  String? _error;
 
   static final _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
@@ -58,14 +58,25 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     FocusScope.of(context).unfocus();
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
 
-    // TODO(firebase): FirebaseAuth.instance.signInWithEmailAndPassword(...)
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-
-    if (!mounted) return;
-    ref.read(authProvider.notifier).state = true;
-    context.go('/dashboard');
+    try {
+      await ref.read(authRepositoryProvider).signIn(
+            email: _emailC.text,
+            password: _passC.text,
+          );
+      // Sukses: tidak perlu navigasi manual. authStateProvider berubah dan
+      // redirect di router memindahkan user ke /dashboard.
+    } on AuthFailure catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = e.message;
+      });
+    }
   }
 
   @override
@@ -130,11 +141,55 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               ),
             ),
           ),
+          if (_error != null) ...[
+            const SizedBox(height: 16),
+            _ErrorBox(message: _error!),
+          ],
           const SizedBox(height: 24),
           _SubmitButton(
             loading: _loading,
             gradient: isMobile,
             onPressed: _submit,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pesan gagal login (token warna Bahaya).
+class _ErrorBox extends StatelessWidget {
+  const _ErrorBox({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.bahayaBannerBg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 18,
+            color: AppColors.bahayaBannerTitle,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.bahayaBannerTitle,
+              ),
+            ),
           ),
         ],
       ),

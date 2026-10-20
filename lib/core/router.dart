@@ -12,19 +12,28 @@ import '../shared/app_shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
-  ref.listen<bool>(authProvider, (_, __) => refresh.value++);
+  ref.listen(authStateProvider, (_, __) => refresh.value++);
+  ref.listen(splashGateProvider, (_, __) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   final router = GoRouter(
     initialLocation: '/splash',
     refreshListenable: refresh,
     redirect: (context, state) {
-      final loggedIn = ref.read(authProvider);
+      final auth = ref.read(authStateProvider);
+      final gate = ref.read(splashGateProvider);
       final loc = state.matchedLocation;
-      if (loc == '/splash') return null;
-      if (!loggedIn && loc != '/login') return '/login';
-      if (loggedIn && loc == '/login') return '/dashboard';
-      return null;
+
+      // Sesi belum terbaca (atau jeda splash belum selesai): tahan di splash.
+      final resolving = (auth.isLoading && !auth.hasValue) || gate.isLoading;
+      if (resolving) return loc == '/splash' ? null : '/splash';
+
+      // Error membaca sesi diperlakukan sebagai belum login.
+      final loggedIn = auth.valueOrNull != null;
+      if (loggedIn) {
+        return (loc == '/splash' || loc == '/login') ? '/dashboard' : null;
+      }
+      return loc == '/login' ? null : '/login';
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),

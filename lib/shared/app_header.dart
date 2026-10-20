@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../core/app_colors.dart';
 import '../core/breakpoints.dart';
@@ -115,10 +114,9 @@ class AppHeader extends ConsumerWidget {
         ],
       ),
     );
-    if (ok == true && context.mounted) {
-      // TODO(firebase): await FirebaseAuth.instance.signOut();
-      ref.read(authProvider.notifier).state = false;
-      context.go('/login');
+    if (ok == true) {
+      // Redirect di router otomatis memindahkan user ke /login.
+      await ref.read(authRepositoryProvider).signOut();
     }
   }
 }

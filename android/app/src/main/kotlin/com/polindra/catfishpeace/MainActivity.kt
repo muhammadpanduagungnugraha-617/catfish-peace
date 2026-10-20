@@ -1,4 +1,4 @@
-package com.example.catfish_peace
+package com.polindra.catfishpeace
 
 import io.flutter.embedding.android.FlutterActivity
 
