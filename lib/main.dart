@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/app_theme.dart';
 import 'core/router.dart';
+import 'features/notifikasi/application/notification_service.dart';
 // File ini di-generate `flutterfire configure` dan masuk .gitignore.
 import 'firebase_options.dart';
 
@@ -20,7 +21,12 @@ class CatfishPeaceApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(notificationBootstrapProvider);
+    ref.listen(foregroundAlertProvider, (_, next) {
+      next.whenData(showForegroundAlert);
+    });
     return MaterialApp.router(
+      scaffoldMessengerKey: rootMessengerKey,
       title: 'Catfish Peace',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

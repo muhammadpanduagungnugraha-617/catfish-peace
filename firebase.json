@@ -1,1 +1,31 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"catfish-peace-polindra","appId":"1:307257182718:android:4a453a2b395bbf393a98af","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"catfish-peace-polindra","configurations":{"android":"1:307257182718:android:4a453a2b395bbf393a98af","ios":"1:307257182718:ios:23b9e7f975ecac823a98af","macos":"1:307257182718:ios:23b9e7f975ecac823a98af","web":"1:307257182718:web:336598539c0865743a98af","windows":"1:307257182718:web:7600663b944c171d3a98af"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "catfish-peace-polindra",
+          "appId": "1:307257182718:android:4a453a2b395bbf393a98af",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "catfish-peace-polindra",
+          "configurations": {
+            "android": "1:307257182718:android:4a453a2b395bbf393a98af",
+            "ios": "1:307257182718:ios:23b9e7f975ecac823a98af",
+            "macos": "1:307257182718:ios:23b9e7f975ecac823a98af",
+            "web": "1:307257182718:web:336598539c0865743a98af",
+            "windows": "1:307257182718:web:7600663b944c171d3a98af"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default"
+    }
+  ]
+}
