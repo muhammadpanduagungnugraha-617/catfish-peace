@@ -93,7 +93,7 @@ Tulis setiap kali kondisi relay berubah (dibaca dari pin/feedback, bukan
 sekadar menyalin perintah), dan ulangi berkala (mis. tiap 10 detik). Bila node
 ini belum ada, app menampilkan "Status belum dilaporkan alat".
 
-## `sensor_history` (ESP32 tulis, ±tiap 5 menit)
+## `sensor_history` (ESP32 tulis, tiap 1 menit)
 
 Satu entri per pencatatan, kuncinya epoch detik (`/sensor_history/<epoch>`):
 
@@ -101,8 +101,9 @@ Satu entri per pencatatan, kuncinya epoch detik (`/sensor_history/<epoch>`):
 { "timestamp": 1761000000, "suhu": 28.5, "ph": 7.2, "kekeruhan": 6.5, "amonia": 0.15 }
 ```
 
-Jangan menulis tiap 2 detik: itu 43.200 entri per hari. Layar Riwayat di app
-**belum** membaca node ini.
+Jangan menulis tiap 2 detik: itu 43.200 entri per hari (tiap 1 menit = 1.440).
+Layar Riwayat membaca 120 entri terakhir (`limitToLast`) dan menurunkan Log
+Peringatan dari perubahan status antar entri.
 
 ## Tanggung jawab firmware (bukan app)
 

@@ -46,7 +46,9 @@ class RiwayatScreen extends ConsumerWidget {
               message: 'Riwayat sensor tidak bisa dimuat.',
               onRetry: () => ref.invalidate(sensorHistoryProvider),
             ),
-            data: (points) => Column(
+            data: (points) => points.length < 2
+                ? const _EmptyChart()
+                : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SensorChart(points: points),
@@ -69,7 +71,7 @@ class RiwayatScreen extends ConsumerWidget {
           title: 'Log Peringatan',
           subtitle: logs.maybeWhen(
             data: (l) => l.isEmpty
-                ? 'Belum ada kejadian tercatat'
+                ? 'Belum ada perubahan status pada $kHistoryLimit pencatatan terakhir'
                 : '${l.length} kejadian tercatat',
             orElse: () => 'Memuat log…',
           ),
@@ -100,6 +102,24 @@ class RiwayatScreen extends ConsumerWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _EmptyChart extends StatelessWidget {
+  const _EmptyChart();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 40),
+      child: Center(
+        child: Text(
+          'Belum cukup data riwayat. Alat mencatat tiap 1 menit.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+      ),
     );
   }
 }

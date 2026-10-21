@@ -19,5 +19,3 @@ const bool kDisableControlsWhenOffline = true;
 const String kRtdbUrlFallback =
     'https://catfish-peace-polindra-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-/// Jika true, daftar log peringatan dikosongkan (untuk melihat state kosong).
-const bool kDummyEmptyLogs = false;

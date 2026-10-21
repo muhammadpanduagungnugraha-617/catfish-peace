@@ -83,7 +83,7 @@ class SensorChart extends StatelessWidget {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 28,
-            interval: 4,
+            interval: (points.length / 6).ceilToDouble().clamp(1.0, 1000.0).toDouble(),
             getTitlesWidget: (value, meta) {
               final i = value.toInt();
               if (i < 0 || i >= points.length) return const SizedBox.shrink();

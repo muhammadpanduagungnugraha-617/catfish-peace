@@ -1,57 +1,38 @@
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/app_config.dart';
-import '../../../core/thresholds.dart';
+import '../../../core/database_provider.dart';
+import '../domain/alert_derivation.dart';
 import '../domain/alert_log.dart';
 import '../domain/sensor_point.dart';
 
-/// Tahap UI: 24 titik per jam (dummy). Nanti dari RTDB `sensor_history`.
-final sensorHistoryProvider = FutureProvider<List<SensorPoint>>((ref) async {
-  await Future<void>.delayed(const Duration(milliseconds: 600));
-  final now = DateTime.now();
-  return List.generate(24, (i) {
-    final amonia = i == 19
-        ? 0.42
-        : i == 20
-            ? 0.65
-            : i == 21
-                ? 0.38
-                : 0.14 + 0.02 * sin(i.toDouble());
-    return SensorPoint(
-      timestamp: now.subtract(Duration(hours: 23 - i)),
-      suhu: 28.3 + 0.8 * sin(i / 3.0),
-      ph: 7.2 + 0.25 * cos(i / 4.0),
-      kekeruhan: 8.0 + 4.0 * sin(i / 2.5),
-      amonia: amonia,
-    );
+/// Jumlah pencatatan terakhir yang dimuat. Firmware menulis tiap 1 menit,
+/// jadi 120 titik = 2 jam terakhir.
+const int kHistoryLimit = 120;
+
+/// Ubah snapshot `sensor_history` menjadi daftar titik urut waktu naik.
+/// Entri rusak dilewati.
+List<SensorPoint> parseSensorHistory(Object? raw) {
+  if (raw is! Map) return const [];
+  final points = <SensorPoint>[];
+  raw.forEach((key, value) {
+    final p = SensorPoint.tryParse(key, value);
+    if (p != null) points.add(p);
   });
+  points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  return points;
+}
+
+/// Stream langsung dari RTDB `sensor_history` (kunci = epoch detik).
+final sensorHistoryProvider = StreamProvider<List<SensorPoint>>((ref) {
+  final query = ref
+      .watch(databaseProvider)
+      .ref('sensor_history')
+      .orderByKey()
+      .limitToLast(kHistoryLimit);
+  return query.onValue.map((e) => parseSensorHistory(e.snapshot.value));
 });
 
-/// Tahap UI: 2 log dummy. Nanti dari Firestore `alert_logs` (urut terbaru).
-final alertLogsProvider = FutureProvider<List<AlertLog>>((ref) async {
-  await Future<void>.delayed(const Duration(milliseconds: 600));
-  if (kDummyEmptyLogs) return const [];
-  final now = DateTime.now();
-  return [
-    AlertLog(
-      id: 'a2',
-      type: ParamStatus.bahaya,
-      parameter: ParamKey.amonia,
-      nilai: 0.65,
-      title: 'Bahaya: Amonia Tinggi · 0.65 PPM',
-      description: 'Aktifkan pompa & aerator untuk menurunkan amonia.',
-      timestamp: now.subtract(const Duration(hours: 3, minutes: 30)),
-    ),
-    AlertLog(
-      id: 'a1',
-      type: ParamStatus.aman,
-      parameter: ParamKey.amonia,
-      nilai: 0.15,
-      title: 'Amonia Normal · 0.15 PPM',
-      description: 'Kadar amonia kembali ke rentang aman.',
-      timestamp: now.subtract(const Duration(hours: 3)),
-    ),
-  ];
+/// Log peringatan diturunkan dari perubahan status di `sensor_history`.
+final alertLogsProvider = Provider<AsyncValue<List<AlertLog>>>((ref) {
+  return ref.watch(sensorHistoryProvider).whenData(deriveAlertLogs);
 });
