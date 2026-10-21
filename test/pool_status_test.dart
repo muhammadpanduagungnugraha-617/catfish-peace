@@ -1,3 +1,4 @@
+import 'package:catfish_peace/core/app_config.dart';
 import 'package:catfish_peace/core/thresholds.dart';
 import 'package:catfish_peace/features/dashboard/domain/pool_status.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -70,13 +71,13 @@ void main() {
       expect(PoolStatus.tryParse(_raw())!.isOnline, isTrue);
     });
 
-    test('3 detik lalu -> masih online', () {
-      final s = PoolStatus.tryParse(_raw(lastUpdated: _nowSec() - 3))!;
+    test('setengah batas stale -> masih online', () {
+      final s = PoolStatus.tryParse(_raw(lastUpdated: _nowSec() - kStaleAfter.inSeconds ~/ 2))!;
       expect(s.isOnline, isTrue);
     });
 
-    test('lebih dari 6 detik -> terputus', () {
-      final s = PoolStatus.tryParse(_raw(lastUpdated: _nowSec() - 9))!;
+    test('melewati batas stale -> terputus', () {
+      final s = PoolStatus.tryParse(_raw(lastUpdated: _nowSec() - kStaleAfter.inSeconds - 3))!;
       expect(s.isOnline, isFalse);
     });
 

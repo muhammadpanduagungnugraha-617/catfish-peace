@@ -6,8 +6,10 @@
 const bool kUseDummyStatus = false;
 
 /// Batas "Terputus": tidak ada pembaruan `last_updated` selama durasi ini.
-/// ESP32 menulis tiap 2 detik, jadi 6 detik = toleransi 2 paket hilang.
-const Duration kStaleAfter = Duration(seconds: 6);
+/// Firmware saat ini menulis tiap 16 detik (INTERVAL_UPDATE_MS), jadi batas
+/// 40 detik = toleransi ~2 paket hilang. Jika interval firmware dipercepat
+/// ke 2 detik, ubah kembali menjadi 6 detik.
+const Duration kStaleAfter = Duration(seconds: 40);
 
 /// Jika true, semua saklar kontrol dinonaktifkan saat alat IoT terputus
 /// (perintah tidak akan sampai ke alat, jadi jangan beri kesan berhasil).

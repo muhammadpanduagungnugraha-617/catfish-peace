@@ -38,9 +38,9 @@ mengklaim pompa menyala padahal relay gagal.
   valid dan menampilkan "belum ada data" (bukan angka palsu).
 - `last_updated`: epoch **detik**. Wajib dari jam NTP. Jangan pakai `millis()`
   atau jam yang belum sinkron: app menilai "Terputus" dari nilai ini.
-- `is_connected`: set `true` saat menulis, dan daftarkan `onDisconnect()` agar
-  menjadi `false` bila koneksi putus. Bila field ini hilang, app mengandalkan
-  `last_updated`.
+- `is_connected`: set `true` saat menulis. Library Firebase ESP32 yang dipakai
+  (4.4.x) **tidak punya `onDisconnect()`**, jadi ia tidak akan jadi `false`
+  sendiri; app menilai putus dari `last_updated` yang basi (`kStaleAfter`).
 - `status_kondisi` dan `tinggi_air` boleh ada tetapi **tidak dipakai** app.
   Status Aman/Waspada/Bahaya dihitung app dari nilai sensor
   (`lib/core/thresholds.dart`).
@@ -95,7 +95,7 @@ ini belum ada, app menampilkan "Status belum dilaporkan alat".
 
 ## `sensor_history` (ESP32 tulis, ±tiap 5 menit)
 
-Satu entri per pencatatan (pakai `push()`):
+Satu entri per pencatatan, kuncinya epoch detik (`/sensor_history/<epoch>`):
 
 ```json
 { "timestamp": 1761000000, "suhu": 28.5, "ph": 7.2, "kekeruhan": 6.5, "amonia": 0.15 }
