@@ -10,6 +10,7 @@ class PoolStatus {
     required this.kekeruhan,
     required this.amonia,
     required this.lastUpdated,
+    this.sensorOk = true,
     this.serverOffset = Duration.zero,
   });
 
@@ -18,6 +19,10 @@ class PoolStatus {
   final double ph;
   final double kekeruhan;
   final double amonia;
+
+  /// false = alat hidup tetapi sensor air tidak terbaca wajar (lepas/korslet).
+  /// Angka di atas tidak boleh ditampilkan sebagai pembacaan sah.
+  final bool sensorOk;
 
   /// Waktu pembaruan terakhir dari ESP32 (epoch detik, jam server/NTP).
   final DateTime lastUpdated;
@@ -51,6 +56,7 @@ class PoolStatus {
         kekeruhan: kekeruhan,
         amonia: amonia,
         lastUpdated: lastUpdated,
+        sensorOk: sensorOk,
         serverOffset: offset,
       );
 
@@ -91,6 +97,7 @@ class PoolStatus {
       kekeruhan: kekeruhan,
       amonia: amonia,
       lastUpdated: _fromEpoch(ts),
+      sensorOk: raw['sensor_ok'] != false,
       serverOffset: serverOffset,
     );
   }

@@ -56,6 +56,12 @@ void main() {
       expect(s.isOnline, isTrue);
     });
 
+    test('sensor_ok false terbaca; hilang dianggap ok', () {
+      expect(PoolStatus.tryParse(_raw()..['sensor_ok'] = false)!.sensorOk,
+          isFalse);
+      expect(PoolStatus.tryParse(_raw())!.sensorOk, isTrue);
+    });
+
     test('nilai integer dari RTDB tetap terbaca sebagai double', () {
       final raw = _raw()
         ..['suhu'] = 29

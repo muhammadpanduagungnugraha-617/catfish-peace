@@ -41,6 +41,9 @@ mengklaim pompa menyala padahal relay gagal.
 - `is_connected`: set `true` saat menulis. Library Firebase ESP32 yang dipakai
   (4.4.x) **tidak punya `onDisconnect()`**, jadi ia tidak akan jadi `false`
   sendiri; app menilai putus dari `last_updated` yang basi (`kStaleAfter`).
+- `sensor_ok`: `false` bila sensor air tidak terbaca wajar (lepas/korslet).
+  App menampilkan "Sensor bermasalah" dan tidak menampilkan angka; alat tetap
+  dianggap terhubung supaya kontrol manual tetap bisa dipakai. Hilang = ok.
 - `status_kondisi` dan `tinggi_air` boleh ada tetapi **tidak dipakai** app.
   Status Aman/Waspada/Bahaya dihitung app dari nilai sensor
   (`lib/core/thresholds.dart`).
@@ -107,6 +110,11 @@ Peringatan dari perubahan status antar entri.
 
 ## Tanggung jawab firmware (bukan app)
 
+- Pompa manual: maks 5 menit (probiotik 1 menit); pompa buang ditolak bila bak
+  hampir kosong, pompa isi ditolak bila bak penuh. Perintah yang ditolak
+  dikembalikan ke `false` di `kolam_control`.
+- Tanpa sensor level yang sah atau sensor air yang sah, siklus otomatis tidak
+  dimulai dan siklus yang berjalan dihentikan.
 - Mode otomatis **harus tetap berjalan walau Wi-Fi atau Firebase mati**.
   Keselamatan ikan tidak boleh bergantung pada cloud.
 - Beri histeresis pada ambang agar relay tidak menyala-mati berulang.
