@@ -23,6 +23,10 @@ class NotificationService {
     try {
       await _fm.requestPermission(); // Android 13+ menampilkan dialog izin.
       await _fm.subscribeToTopic(kAlertTopic);
+      if (kDebugMode) {
+        // Untuk "Send test message" di Firebase Console. Hanya mode debug.
+        debugPrint('FCM token: ${await _fm.getToken()}');
+      }
     } catch (e) {
       debugPrint('Notifikasi: gagal berlangganan ($e)');
     }
