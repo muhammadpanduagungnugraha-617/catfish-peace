@@ -41,3 +41,20 @@ firebase deploy --only functions
 - Semua perangkat yang login menerima peringatan yang sama (topik tunggal).
 - Rules RTDB masih `auth != null`: pengguna login bisa menulis
   `notifikasi_state`. Batasi di tahap rules per-UID.
+
+## Alternatif tanpa Blaze: skrip `notifier/`
+Skrip Node.js biasa yang membaca RTDB dan mengirim FCM, dengan logika yang
+sama dengan Cloud Function. Gratis, tetapi **harus menyala terus** (PC,
+Raspberry Pi, atau VPS). Bila skrip mati, notifikasi berhenti.
+
+```
+# 1. Firebase Console -> Project settings -> Service accounts ->
+#    Generate new private key -> simpan sebagai notifier/serviceAccount.json
+#    (SUDAH di .gitignore. Jangan commit, jangan kirim ke siapa pun.)
+cd notifier
+npm install
+npm start
+```
+Log `[FCM] ... -> projects/.../messages/...` berarti terkirim. Pakai SALAH SATU:
+Cloud Functions (`functions/`) atau `notifier/`, jangan keduanya, supaya
+notifikasi tidak ganda.
